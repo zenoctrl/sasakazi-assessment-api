@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+    <main>
+        <form action="/add" method="post">
+            <h1>Add a question</h1>
+            <select name="category" id="" required>
+                <option value="">-- Please choose a category --</option>
+                <option value="aptitude">Aptitude</option>
+                <option value="networks">Networks</option>
+                <option value="tech_support">Tech Support</option>
+                <option value="ai_cc_iot">AI, Cloud Computing, IoT</option>
+            </select>
+            <label for="">Question</label>
+            <input type="text" name="question" id="" required>
+            <label for="">Image URL</label>
+            <input type="text" name="imageURL" id="">
+            <div id="choices">
+                <label for="">Choices</label>
+                <span><img src="/images/plus-circle.svg" alt="">Add a choice</span>
+                <div class="choice">
+                    <input type="text" name="option[]" id="">
+                </div>
+            </div>
+            
+            <input type="submit" value="Save">
+        </form>
+    </main>
+
+    <script src="/js/add_choice.js"></script>
+  
+<%- include('partials/footer') %>
