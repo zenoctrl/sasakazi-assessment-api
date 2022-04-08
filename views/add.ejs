@@ -1,6 +1,6 @@
 <%- include('partials/header') %>
 
-    <main>
+    <main class="container" id="add">
         <form action="/add" method="post">
             <h1>Add a question</h1>
             <select name="category" id="" required>
@@ -16,12 +16,10 @@
             <input type="text" name="imageURL" id="">
             <div id="choices">
                 <label for="">Choices</label>
-                <span><img src="/images/plus-circle.svg" alt="">Add a choice</span>
-                <div class="choice">
-                    <input type="text" name="option[]" id="">
-                </div>
+                <span id="add-choice"><img src="/images/plus-circle.svg" alt="">Add a choice</span>
             </div>
-            
+            <label for="">Correct answer</label>
+            <input type="text" name="answer" id="">
             <input type="submit" value="Save">
         </form>
     </main>
