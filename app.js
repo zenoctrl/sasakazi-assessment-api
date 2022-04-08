@@ -31,7 +31,7 @@ app.post('/add', (req, res) => {
     let options = req.body.options
     for(let option of options) {
         // check for option type and replace
-        if(Number(option) !== NaN) {
+        if(!isNaN(Number(option))) {
             options.splice(options.indexOf(option), 1, Number(option))
         } else if(option.toLowerCase() === 'false' || option.toLowerCase() === 'true') {
             options.splice(options.indexOf(option), 1, JSON.parse(option.toLowerCase()))
@@ -42,7 +42,7 @@ app.post('/add', (req, res) => {
 
     let answer = req.body.answer
     // check for answer type and replace
-    if(Number(answer) !== NaN) {
+    if(!isNaN(Number(answer))) {
         answer = Number(answer)
     } else if(answer.toLowerCase() === 'false' || answer.toLowerCase() === 'true') {
         answer = JSON.parse(answer.toLowerCase())
