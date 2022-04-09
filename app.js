@@ -2,7 +2,16 @@ import express from 'express'
 import methodOverride from 'method-override'
 
 const app = express()
-const questions = []
+const questions = [
+    {
+        id: 1,
+        category: 'aptitude',
+        question: 'testing the choice types',
+        imageURL: '',
+        options: [ 10, true, '10%', 'some string' ],
+        answer: 10
+    }
+]
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
@@ -60,6 +69,12 @@ app.post('/add', (req, res) => {
     // questions.push(question);
     // res.send(question);
     console.log(question)
+})
+
+// edit a question - display form
+app.get('/edit/:id', (req, res) => {
+    const question = questions.find(question => question.id === parseInt(req.params.id))
+    res.render('edit.ejs', {edit: true, question: question})
 })
 
 // edit a question
