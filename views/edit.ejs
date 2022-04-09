@@ -1,7 +1,7 @@
 <%- include('partials/header') %>
 
     <main class="container" id="add">
-        <form action="/edit/<%= question.id %>" method="post">
+        <form action="/edit/<%= question.id %>?_method=PUT" method="post">
             <h1>Edit a question</h1>
             <select name="category" id="" required>
                 <option value="">-- Please choose a category --</option>
@@ -19,7 +19,7 @@
                 <span id="add-choice"><img src="/images/plus-circle.svg" alt="">Add a choice</span>
                 <% question.options.forEach(option => { %>
                     <div class="choice">
-                        <input type="text" name="option" id="" value="<%= option %>">
+                        <input type="text" name="options" id="" value="<%= option %>">
                         <span class="delete-choice"><img src="/images/x-circle.svg" alt=""></span>
                     </div>
                 <% }) %>
