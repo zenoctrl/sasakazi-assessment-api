@@ -8,9 +8,9 @@ const questions = [
         category: 'aptitude',
         question: 'testing the choice types',
         imageURL: '',
-        options: [ 10, true, '10%', 'some string' ],
+        options: [ 10, false, '10%', 'some string' ],
         answer: 10
-    }
+      }
 ]
 
 app.set('view engine', 'ejs')
@@ -25,7 +25,7 @@ app.get('/questions', (req, res) => {
 })
 
 // get an individual question
-app.get('/question:id', (req, res) => {
+app.get('/question/:id', (req, res) => {
     const question = questions.find(question => question.id === parseInt(req.params.id))
     res.send(question)
 })
@@ -57,7 +57,6 @@ app.post('/add', (req, res) => {
         answer = JSON.parse(answer.toLowerCase())
     }
 
-
     const question = {
         id: questions.length + 1,
         category: req.body.category,
@@ -66,9 +65,8 @@ app.post('/add', (req, res) => {
         options: options,
         answer: answer
     }
-    // questions.push(question);
-    // res.send(question);
-    console.log(question)
+    questions.push(question);
+    res.send(question);
 })
 
 // edit a question - display form
@@ -79,10 +77,41 @@ app.get('/edit/:id', (req, res) => {
 
 // edit a question
 app.put('/edit/:id', (req, res) => {
+    let options = req.body.options
+    for(let option of options) {
+        // check for option type and replace
+        if(!isNaN(Number(option))) {
+            options.splice(options.indexOf(option), 1, Number(option))
+        } else if(option.toLowerCase() === 'false' || option.toLowerCase() === 'true') {
+            options.splice(options.indexOf(option), 1, JSON.parse(option.toLowerCase()))
+        } else {
+            continue
+        }
+    }
+
+    let answer = req.body.answer
+    // check for answer type and replace
+    if(!isNaN(Number(answer))) {
+        answer = Number(answer)
+    } else if(answer.toLowerCase() === 'false' || answer.toLowerCase() === 'true') {
+        answer = JSON.parse(answer.toLowerCase())
+    }
+
+    const question = questions.find(question => question.id === parseInt(req.params.id))
+    const edit = {
+        id: parseInt(req.params.id),
+        category: req.body.category,
+        question: req.body.question,
+        imageURL: req.body.imageURL,
+        options: options,
+        answer: answer
+    }
+    questions.splice(questions.indexOf(question), 1, edit)
+    res.send(question);
 })
 
 // delete a question
-app.delete('/aptitude/:id', (req, res) => {
+app.delete('/delete-question/:id', (req, res) => {
     const question = questions.find(question => question.id === parseInt(req.params.id))
     const index = questions.indexOf(question);
     questions.splice(index, 1);
