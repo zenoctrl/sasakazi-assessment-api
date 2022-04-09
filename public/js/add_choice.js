@@ -14,6 +14,7 @@ span.addEventListener('click', () => {
     input.setAttribute('type', 'text')
     input.name = 'options'
     let span = document.createElement('span')
+    span.className = 'delete-choice'
     span.innerHTML = '<img src="/images/x-circle.svg" alt="">'
     div.append(span)
     span.addEventListener('click', deleteChoice)
