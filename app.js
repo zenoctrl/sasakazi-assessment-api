@@ -2,16 +2,7 @@ import express from 'express'
 import methodOverride from 'method-override'
 
 const app = express()
-const questions = [
-    {
-        id: 1,
-        category: 'aptitude',
-        question: 'testing the choice types',
-        imageURL: '',
-        options: [ 10, false, '10%', 'some string' ],
-        answer: 10
-      }
-]
+const questions = []
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
