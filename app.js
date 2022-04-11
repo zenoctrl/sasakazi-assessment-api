@@ -20,7 +20,13 @@ app.use(methodOverride('_method'))
 app.use(express.urlencoded({extended: false}))
 
 const replaceOptionsAnswer = data => {
-    let options = data.options.substr(1, data.options.length - 2).split(', ')
+    let options
+    if(typeof data.options === 'string') {
+        options = data.options.substr(1, data.options.length - 2).split(', ') 
+    } else {
+        options = data.options
+    }
+
     for(let option of options) {
         // check for option type and replace
         if(!isNaN(Number(option))) {
@@ -43,6 +49,7 @@ const replaceOptionsAnswer = data => {
     } else if(answer.toLowerCase() === 'false' || answer.toLowerCase() === 'true') {
         answer = JSON.parse(answer.toLowerCase())
     }
+
     return {options: options, answer: answer}
 }
 
@@ -102,24 +109,17 @@ app.get('/add', (req, res) => {
 app.post('/add', (req, res) => {
 
     let { options, answer } = replaceOptionsAnswer(req.body)
-
     connection.query(
         'INSERT INTO questions (category, question, imageURL, options, answer) VALUES (?,?,?,JSON_ARRAY(?),?)',
         [req.body.category, req.body.question, req.body.imageURL, [...options], answer],
         (error, results) => {
-            // res.send(results)
-            if(error) {
-                console.log(error)
-            } else {
-                console.log(results)
-            }
+            res.redirect('/questions')
         }
     )
 })
 
 // edit a question - display form
 app.get('/edit/:id', (req, res) => {
-    // const question = questions.find(question => question.id === parseInt(req.params.id))
     connection.query(
         'SELECT * FROM questions where id = ?',
         [parseInt(req.params.id)],
@@ -140,37 +140,16 @@ app.get('/edit/:id', (req, res) => {
 
 // edit a question
 app.put('/edit/:id', (req, res) => {
-    let options = req.body.options
-    for(let option of options) {
-        // check for option type and replace
-        if(!isNaN(Number(option))) {
-            options.splice(options.indexOf(option), 1, Number(option))
-        } else if(option.toLowerCase() === 'false' || option.toLowerCase() === 'true') {
-            options.splice(options.indexOf(option), 1, JSON.parse(option.toLowerCase()))
-        } else {
-            continue
+
+    let { options, answer } = replaceOptionsAnswer(req.body)
+
+    connection.query(
+        'UPDATE questions SET category = ?, question = ? , imageURL = ?, options = JSON_ARRAY(?), answer = ? WHERE id = ?',
+        [req.body.category, req.body.question, req.body.imageURL, [...options], answer, parseInt(req.params.id)],
+        (error, results) => {
+            res.redirect('/questions')
         }
-    }
-
-    let answer = req.body.answer
-    // check for answer type and replace
-    if(!isNaN(Number(answer))) {
-        answer = Number(answer)
-    } else if(answer.toLowerCase() === 'false' || answer.toLowerCase() === 'true') {
-        answer = JSON.parse(answer.toLowerCase())
-    }
-
-    const question = questions.find(question => question.id === parseInt(req.params.id))
-    const edit = {
-        id: parseInt(req.params.id),
-        category: req.body.category,
-        question: req.body.question,
-        imageURL: req.body.imageURL,
-        options: options,
-        answer: answer
-    }
-    questions.splice(questions.indexOf(question), 1, edit)
-    res.send(question);
+    )
 })
 
 // delete a question
@@ -179,7 +158,7 @@ app.delete('/delete-question/:id', (req, res) => {
         'DELETE FROM questions WHERE id = ?',
         [parseInt(req.params.id)],
         (error, results) => {
-            res.send(results)
+            res.redirect('/questions')
         }
     )
 })
