@@ -21,20 +21,49 @@ app.use(express.urlencoded({extended: false}))
 
 // get all questions
 app.get('/questions', (req, res) => {
-
     connection.query(
         'SELECT * FROM questions',
         (error, results) => {
-            res.send(results)
+            const questions = []
+            results.forEach(result => {
+                let options = result.options.substr(1, result.options.length - 2).split(', ')
+                for(let option of options) {
+                    // check for option type and replace
+                    if(!isNaN(Number(option))) {
+                        options.splice(options.indexOf(option), 1, Number(option))
+                    } else if(option.toLowerCase() === 'false' || option.toLowerCase() === 'true') {
+                        options.splice(options.indexOf(option), 1, JSON.parse(option.toLowerCase()))
+                    } else {
+                        options.splice(options.indexOf(option), 1, option.substr(1, option.length - 2))
+                    }
+                }
+
+                let answer = result.answer
+                // check for answer type and replace
+                if(!isNaN(Number(answer))) {
+                    answer = Number(answer)
+                } else if(answer.toLowerCase() === 'false' || answer.toLowerCase() === 'true') {
+                    answer = JSON.parse(answer.toLowerCase())
+                }
+
+                const question = {
+                    id: result.id,
+                    category: result.category,
+                    question: result.question,
+                    imageURL: result.imageURL,
+                    options: options,
+                    answer: answer
+                }
+
+                questions.push(question)
+            })
+            res.send(questions)
         }
     )
-
-    // res.send(questions)
 })
 
 // get an individual question
 app.get('/question/:id', (req, res) => {
-
     connection.query(
         'SELECT * FROM questions WHERE id = ?',
         [parseInt(req.params.id)],
@@ -112,17 +141,6 @@ app.post('/add', (req, res) => {
             }
         }
     )
-
-    // const question = {
-    //     id: questions.length + 1,
-    //     category: req.body.category,
-    //     question: req.body.question,
-    //     imageURL: req.body.imageURL,
-    //     options: options,
-    //     answer: answer
-    // }
-    // questions.push(question);
-    // res.send(question);
 })
 
 // edit a question - display form
