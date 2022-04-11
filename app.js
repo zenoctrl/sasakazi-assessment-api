@@ -39,12 +39,38 @@ app.get('/question/:id', (req, res) => {
         'SELECT * FROM questions WHERE id = ?',
         [parseInt(req.params.id)],
         (error, results) => {
-            res.send(results[0])
+
+            let options = results[0].options.substr(1, results[0].options.length - 2).split(', ')
+            for(let option of options) {
+                // check for option type and replace
+                if(!isNaN(Number(option))) {
+                    options.splice(options.indexOf(option), 1, Number(option))
+                } else if(option.toLowerCase() === 'false' || option.toLowerCase() === 'true') {
+                    options.splice(options.indexOf(option), 1, JSON.parse(option.toLowerCase()))
+                } else {
+                    options.splice(options.indexOf(option), 1, option.substr(1, option.length - 2))
+                }
+            }
+
+            let answer = results[0].answer
+            // check for answer type and replace
+            if(!isNaN(Number(answer))) {
+                answer = Number(answer)
+            } else if(answer.toLowerCase() === 'false' || answer.toLowerCase() === 'true') {
+                answer = JSON.parse(answer.toLowerCase())
+            }
+
+            const question = {
+                id: results[0].id,
+                category: results[0].category,
+                question: results[0].question,
+                imageURL: results[0].imageURL,
+                options: options,
+                answer: answer
+            }
+            res.send(question)
         }
     )
-
-    // const question = questions.find(question => question.id === parseInt(req.params.id))
-    // res.send(question)
 })
 
 // add a question - display form
