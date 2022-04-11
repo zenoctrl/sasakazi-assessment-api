@@ -1,7 +1,16 @@
 import express from 'express'
 import methodOverride from 'method-override'
+import mysql from 'mysql'
 
 const app = express()
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'sasakazi_api_db'
+})
+
+
 const questions = []
 
 app.set('view engine', 'ejs')
@@ -12,13 +21,30 @@ app.use(express.urlencoded({extended: false}))
 
 // get all questions
 app.get('/questions', (req, res) => {
-    res.send(questions)
+
+    connection.query(
+        'SELECT * FROM questions',
+        (error, results) => {
+            res.send(results)
+        }
+    )
+
+    // res.send(questions)
 })
 
 // get an individual question
 app.get('/question/:id', (req, res) => {
-    const question = questions.find(question => question.id === parseInt(req.params.id))
-    res.send(question)
+
+    connection.query(
+        'SELECT * FROM questions WHERE id = ?',
+        [parseInt(req.params.id)],
+        (error, results) => {
+            res.send(results[0])
+        }
+    )
+
+    // const question = questions.find(question => question.id === parseInt(req.params.id))
+    // res.send(question)
 })
 
 // add a question - display form
@@ -48,16 +74,29 @@ app.post('/add', (req, res) => {
         answer = JSON.parse(answer.toLowerCase())
     }
 
-    const question = {
-        id: questions.length + 1,
-        category: req.body.category,
-        question: req.body.question,
-        imageURL: req.body.imageURL,
-        options: options,
-        answer: answer
-    }
-    questions.push(question);
-    res.send(question);
+    connection.query(
+        'INSERT INTO questions (category, question, imageURL, options, answer) VALUES (?,?,?,JSON_ARRAY(?),?)',
+        [req.body.category, req.body.question, req.body.imageURL, [...options], answer],
+        (error, results) => {
+            // res.send(results)
+            if(error) {
+                console.log(error)
+            } else {
+                console.log(results)
+            }
+        }
+    )
+
+    // const question = {
+    //     id: questions.length + 1,
+    //     category: req.body.category,
+    //     question: req.body.question,
+    //     imageURL: req.body.imageURL,
+    //     options: options,
+    //     answer: answer
+    // }
+    // questions.push(question);
+    // res.send(question);
 })
 
 // edit a question - display form
@@ -103,10 +142,19 @@ app.put('/edit/:id', (req, res) => {
 
 // delete a question
 app.delete('/delete-question/:id', (req, res) => {
-    const question = questions.find(question => question.id === parseInt(req.params.id))
-    const index = questions.indexOf(question);
-    questions.splice(index, 1);
-    res.send(question)
+
+    connection.query(
+        'DELETE FROM questions WHERE id = ?',
+        [parseInt(req.params.id)],
+        (error, results) => {
+            res.send(results)
+        }
+    )
+
+    // const question = questions.find(question => question.id === parseInt(req.params.id))
+    // const index = questions.indexOf(question);
+    // questions.splice(index, 1);
+    // res.send(question)
 })
 
 const PORT = process.env.PORT || 3000
