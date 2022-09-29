@@ -37,25 +37,32 @@
     flex-direction: column;
 }
 
-#add form #choices img {
+#add-choice {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #DCDBDA;
+    border-radius: 5px;
+    margin: 4px 0 8px;
+    width: max-content;
+}
+
+#add-choice img {
+    width: 24px;
+    height: 24px;
     margin-right: 10px;
 }
 
 #add form .choice {
-    /* position: relative; */
     display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
-/* #add form .choice input {
-    width: 100%;
+#add form .choice input {
+    flex-grow: 1;
 }
 
-#add form .choice span {
-    position: absolute;
-    right: 0;
-    top: 0;
-} */
 
 .choice img {
     margin-left: 5px;
