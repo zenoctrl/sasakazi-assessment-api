@@ -18,7 +18,7 @@
     display: flex;
     flex-direction: column;
     margin: 20px auto 0;
-    width: 60%;
+    width: 80%;
     font-size: 24px;
     padding: 15px;
     border: 1px solid #f2f3f2;
@@ -42,10 +42,12 @@
 }
 
 #add form .choice {
-    position: relative;
+    /* position: relative; */
+    display: flex;
+    align-items: center;
 }
 
-#add form .choice input {
+/* #add form .choice input {
     width: 100%;
 }
 
@@ -53,7 +55,14 @@
     position: absolute;
     right: 0;
     top: 0;
+} */
+
+.choice img {
+    margin-left: 5px;
+    width: 45px;
+    height: 45px;
 }
+
 
 #add form input[type='submit'] {
     width: 100px;
@@ -64,3 +73,16 @@
     margin-top: 12px;
 }
 
+#field {
+    display: none;
+}
+
+@media screen and (max-width:600px) {
+    .container {
+        padding: 0 10px;
+    }
+
+    #add form {
+        width: 100%;
+    }
+}
