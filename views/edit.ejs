@@ -3,15 +3,18 @@
     <main class="container" id="add">
         <form action="/edit/<%= question.id %>?_method=PUT" method="post">
             <h1>Edit a question</h1>
-            <select name="category" id="" required>
+            <select name="category" id="category" required>
                 <option value="">-- Please choose a category --</option>
-                <option value="aptitude">Aptitude</option>
-                <option value="networks">Networks</option>
-                <option value="tech_support">Tech Support</option>
-                <option value="ai_cc_iot">AI, Cloud Computing, IoT</option>
+                <option value="aptitude">Aptitude Test</option>
+                <option value="skill-based">Skill-based Test</option>
             </select>
+
+            <select name="field" id="field">
+            </select>
+
             <label for="">Question</label>
-            <input type="text" name="question" id="" required value="<%= question.question %>">
+            <!-- <input type="text" name="question" id="" required value="<%= question.question %>"> -->
+            <textarea name="question" id="" cols="30" rows="10" required><%= question.question %></textarea>
             <label for="">Image URL</label>
             <input type="text" name="imageURL" id="" value="<%= question.imageURL %>">
             <div id="choices">

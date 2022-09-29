@@ -3,15 +3,18 @@
     <main class="container" id="add">
         <form action="/add" method="post">
             <h1>Add a question</h1>
-            <select name="category" id="" required>
+            <select name="category" id="category" required>
                 <option value="">-- Please choose a category --</option>
                 <option value="aptitude">Aptitude</option>
-                <option value="networks">Networks</option>
-                <option value="tech_support">Tech Support</option>
-                <option value="ai_cc_iot">AI, Cloud Computing, IoT</option>
+                <option value="skill-based">Skill-based Test</option>
             </select>
+
+            <select name="field" id="field">
+            </select>
+
             <label for="">Question</label>
-            <input type="text" name="question" id="" required>
+            <!-- <input type="text" name="question" id="" required> -->
+            <textarea name="question" id="" cols="30" rows="10" required></textarea>
             <label for="">Image URL</label>
             <input type="text" name="imageURL" id="">
             <div id="choices">
