@@ -1,4 +1,4 @@
-let span = document.querySelector('#add-choice')
+let addChoice = document.querySelector('#add-choice')
 let choices = document.querySelector('#choices')
 let deleteChoiceBtns = document.querySelectorAll('.delete-choice')
 let markBtns = document.querySelectorAll('.markBtn')
@@ -38,11 +38,12 @@ selectCategory.addEventListener('change', () => {
 
 
 const deleteChoice = (e) => {
-    let choice = e.target.parentElement
+    let choice = e.target.parentElement.parentElement
     choices.removeChild(choice)
 }
 
 const markCorrect = (e) => {
+    e.preventDefault()
     markBtns.forEach(markBtn => markBtn.setAttribute('src', '/images/correct.png'))
     // e.target.src = '/images/correct.png'
     let markBtn = e.target
@@ -56,7 +57,7 @@ const markCorrect = (e) => {
     }
 }
 
-span.addEventListener('click', () => {
+addChoice.addEventListener('click', () => {
     let div = document.createElement('div')
     div.className = 'choice'
     let input = document.createElement("input")
@@ -64,19 +65,24 @@ span.addEventListener('click', () => {
     input.name = 'options'
     div.appendChild(input)
 
+    let divBtns = document.createElement('div')
+
     // create button to mark correct choice
     let markBtn = document.createElement('img')
     markBtn.className = 'markBtn'
     markBtn.src= '/images/check-mark.png'
     markBtn.addEventListener('click', markCorrect)
-    div.appendChild(markBtn)
+    divBtns.appendChild(markBtn)
 
     // create button to delete a choice
     let deleteBtn = document.createElement('img')
     deleteBtn.className = 'delete-choice'
     deleteBtn.src = '/images/remove.png'
     deleteBtn.addEventListener('click', deleteChoice)
-    div.appendChild(deleteBtn)
+    divBtns.appendChild(deleteBtn)
+
+    // add btns to the choice
+    div.appendChild(divBtns)
 
     // add newly created choice to the choices collection
     choices.append(div)
