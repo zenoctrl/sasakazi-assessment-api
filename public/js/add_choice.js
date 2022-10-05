@@ -1,7 +1,6 @@
 let addChoice = document.querySelector('#add-choice')
 let choices = document.querySelector('#choices')
 let deleteChoiceBtns = document.querySelectorAll('.delete-choice')
-let markBtns = document.querySelectorAll('.markBtn')
 let selectCategory = document.querySelector('#category')
 let selectField = document.querySelector('#field')
 const fields = [
@@ -16,7 +15,7 @@ const fields = [
 ]
 
 selectCategory.addEventListener('change', () => {
-    if (selectCategory.value === 'skill-based') {
+    if (selectCategory.value === 'skill based test') {
         let options = document.querySelectorAll('.field')
         options.forEach(option => selectField.removeChild(option))
         let option = document.createElement('option')
@@ -44,16 +43,15 @@ const deleteChoice = (e) => {
 
 const markCorrect = (e) => {
     e.preventDefault()
-    markBtns.forEach(markBtn => markBtn.setAttribute('src', '/images/correct.png'))
-    // e.target.src = '/images/correct.png'
     let markBtn = e.target
-    console.log(markBtn.src)
-    if (!markBtn.src.toString().endsWith('chech-mark.png')) {
+    let markBtns = document.querySelectorAll('.markBtn')
+    let answer = document.querySelector('#answer')
+    if (markBtn.src.toString().endsWith('check-mark.png')) {
+        markBtns.forEach(markBtn => markBtn.src = '/images/check-mark.png')
         markBtn.src = '/images/correct.png'
-        console.log('marked as correct')
+        answer.value = markBtn.parentElement.previousElementSibling.value
     } else {
         markBtn.src = '/images/check-mark.png'
-        console.log('unmarked as correct')
     }
 }
 
