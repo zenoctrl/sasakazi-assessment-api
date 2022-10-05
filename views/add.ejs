@@ -5,15 +5,14 @@
             <h1>Add a question</h1>
             <select name="category" id="category" required>
                 <option value="">-- Please choose a category --</option>
-                <option value="aptitude">Aptitude</option>
-                <option value="skill-based">Skill-based Test</option>
+                <option value="aptitude test">Aptitude</option>
+                <option value="skill based test">Skill-based Test</option>
             </select>
 
             <select name="field" id="field">
             </select>
 
             <label for="">Question</label>
-            <!-- <input type="text" name="question" id="" required> -->
             <textarea name="question" id="" cols="30" rows="10" required></textarea>
             <label for="">Image URL</label>
             <input type="text" name="imageURL" id="">
@@ -21,8 +20,7 @@
                 <label for="">Choices</label>
                 <span id="add-choice"><img src="/images/plus.png" alt="">Add a choice</span>
             </div>
-            <!-- <label for="">Correct answer</label>
-            <input type="text" name="answer" id=""> -->
+            <input type="hidden" name="answer" value="" id="answer">
             <input type="submit" value="Save">
         </form>
     </main>
