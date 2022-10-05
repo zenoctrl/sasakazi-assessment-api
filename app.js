@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'sasakazi_api_db'
+    database: 'api_test'
 })
 
 
@@ -20,19 +20,20 @@ app.use(methodOverride('_method'))
 app.use(express.urlencoded({extended: false}))
 
 const replaceOptionsAnswer = data => {
-    let options
+    let options 
     if(typeof data.options === 'string') {
-        options = data.options.substr(1, data.options.length - 2).split(', ') 
+        // options = data.options.substr(1, data.options.length - 2).split(', ') 
+        options = JSON.parse(data.options)
     } else {
         options = data.options
     }
 
     for(let option of options) {
         // check for option type and replace
-        if(!isNaN(Number(option))) {
+        if(!isNaN(Number(option)) && typeof option !== 'boolean') {
             options.splice(options.indexOf(option), 1, Number(option))
-        } else if(option.toLowerCase() === 'false' || option.toLowerCase() === 'true') {
-            options.splice(options.indexOf(option), 1, JSON.parse(option.toLowerCase()))
+        } else if(option.toString().toLowerCase() === 'false' || option.toString().toLowerCase() === 'true') {
+            options.splice(options.indexOf(option), 1, JSON.parse(option.toString().toLowerCase()))
         } else {
             if(option.includes('"')) {
                 options.splice(options.indexOf(option), 1, option.substr(1, option.length - 2))
@@ -42,12 +43,14 @@ const replaceOptionsAnswer = data => {
         }
     }
 
-    let answer = data.answer
+    let answer
     // check for answer type and replace
-    if(!isNaN(Number(answer))) {
-        answer = Number(answer)
-    } else if(answer.toLowerCase() === 'false' || answer.toLowerCase() === 'true') {
-        answer = JSON.parse(answer.toLowerCase())
+    if (data.answer.toLowerCase() === 'false' || data.answer.toLowerCase() === 'true') {
+        answer = JSON.parse(data.answer.toLowerCase())
+    } else if (!isNaN(Number(data.answer))) {
+        answer = Number(data.answer)
+    } else {
+        answer = data.answer
     }
 
     return {options: options, answer: answer}
@@ -62,16 +65,31 @@ app.get('/questions', (req, res) => {
             results.forEach(result => {
 
                 let { options, answer } = replaceOptionsAnswer(result)
-                const question = {
-                    id: result.id,
-                    category: result.category,
-                    question: result.question,
-                    imageURL: result.imageURL,
-                    options: options,
-                    answer: answer
-                }
 
-                questions.push(question)
+                if (result.category === 'aptitude test') {
+                    const question = {
+                        id: result.id,
+                        category: result.category,
+                        question: result.question,
+                        imageURL: result.imageURL,
+                        options: options,
+                        answer: answer
+                    }
+    
+                    questions.push(question)
+                } else {
+                    const question = {
+                        id: result.id,
+                        category: result.category,
+                        field: result.field,
+                        question: result.question,
+                        imageURL: result.imageURL,
+                        options: options,
+                        answer: answer
+                    }
+    
+                    questions.push(question)
+                }
             })
             res.send(questions)
         }
@@ -84,18 +102,32 @@ app.get('/question/:id', (req, res) => {
         'SELECT * FROM questions WHERE id = ?',
         [parseInt(req.params.id)],
         (error, results) => {
-            
+            let result = results[0]
             let { options, answer } = replaceOptionsAnswer(results[0])
-            const question = {
-                id: results[0].id,
-                category: results[0].category,
-                question: results[0].question,
-                imageURL: results[0].imageURL,
-                options: options,
-                answer: answer
-            }
+            if (results.category === 'aptitude test') {
+                const question = {
+                    id: result.id,
+                    category: result.category,
+                    question: result.question,
+                    imageURL: result.imageURL,
+                    options: options,
+                    answer: answer
+                }
 
-            res.send(question)
+                res.send(question)
+            } else {
+                const question = {
+                    id: result.id,
+                    category: result.category,
+                    field: result.field,
+                    question: result.question,
+                    imageURL: result.imageURL,
+                    options: options,
+                    answer: answer
+                }
+
+                res.send(question)
+            }
         }
     )
 })
@@ -107,15 +139,36 @@ app.get('/add', (req, res) => {
 
 // add a question - submit form
 app.post('/add', (req, res) => {
-
     let { options, answer } = replaceOptionsAnswer(req.body)
+    
+    const test = {
+        category: req.body.category,
+        field: req.body.field || null,
+        question: req.body.question,
+        imageURL: req.body.imageURL,
+        options: options,
+        answer: answer
+    }
+
     connection.query(
-        'INSERT INTO questions (category, question, imageURL, options, answer) VALUES (?,?,?,JSON_ARRAY(?),?)',
-        [req.body.category, req.body.question, req.body.imageURL, [...options], answer],
+        'INSERT INTO questions (category, field, question, imageURL, options, answer) VALUES (?,?,?,?,JSON_ARRAY(?),?)',
+        [
+            test.category, 
+            test.field,
+            test.question,
+            test.imageURL, 
+            [...test.options], 
+            test.answer
+        ],
         (error, results) => {
-            res.redirect('/questions')
+            if (error) {
+                res.send(error)
+            } else {
+                res.redirect('/questions')
+            } 
         }
     )
+    
 })
 
 // edit a question - display form
@@ -128,12 +181,13 @@ app.get('/edit/:id', (req, res) => {
             const question = {
                 id: results[0].id,
                 category: results[0].category,
+                field: results[0].field,
                 question: results[0].question,
                 imageURL: results[0].imageURL,
                 options: options,
                 answer: answer
             }
-            res.render('edit.ejs', {edit: true, question: question})
+            res.render('edit.ejs', {question: question})
         }
     )
 })
