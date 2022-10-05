@@ -1,6 +1,5 @@
 let addChoice = document.querySelector('#add-choice')
 let choices = document.querySelector('#choices')
-let markBtns = document.querySelectorAll('.markBtn')
 let deleteChoiceBtns = document.querySelectorAll('.delete-choice')
 let selectCategory = document.querySelector('#category')
 let selectField = document.querySelector('#field')
@@ -45,11 +44,13 @@ const deleteChoice = (e) => {
 const markCorrect = (e) => {
     e.preventDefault()
     let markBtn = e.target
+    let markBtns = document.querySelectorAll('.markBtn')
     let answer = document.querySelector('#answer')
     if (markBtn.src.toString().endsWith('check-mark.png')) {
         markBtns.forEach(markBtn => markBtn.src = '/images/check-mark.png')
         markBtn.src = '/images/correct.png'
         answer.value = markBtn.parentElement.previousElementSibling.value
+        console.log(`${answer.value} is marked as correct`)
     } else {
         markBtn.src = '/images/check-mark.png'
     }
@@ -86,7 +87,7 @@ addChoice.addEventListener('click', () => {
     choices.append(div)
 })
 
-markBtns.forEach(markBtn => {
+document.querySelectorAll('.markBtn').forEach(markBtn => {
     markBtn.addEventListener('click', markCorrect)
 })
 
