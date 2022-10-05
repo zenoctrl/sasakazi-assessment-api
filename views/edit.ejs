@@ -4,31 +4,42 @@
         <form action="/edit/<%= question.id %>?_method=PUT" method="post">
             <h1>Edit a question</h1>
             <select name="category" id="category" required>
+                <option value="<%= question.category %>"><%= question.category %></option>
                 <option value="">-- Please choose a category --</option>
-                <option value="aptitude">Aptitude Test</option>
-                <option value="skill-based">Skill-based Test</option>
+                <option value="Aptitude Test">Aptitude Test</option>
+                <option value="Skill-based Test">Skill-based Test</option>
             </select>
 
-            <select name="field" id="field">
-            </select>
-
+            <% if(question.category === 'Skill-based Test'){ %>
+                <select name="field" id="field" style="display: block;">
+                    <option value="<%= question.field %>" class="field"><%= question.field %></option>
+                </select>
+            <% } %>
+            
             <label for="">Question</label>
-            <!-- <input type="text" name="question" id="" required value="<%= question.question %>"> -->
-            <textarea name="question" id="" cols="30" rows="10" required><%= question.question %></textarea>
+            <textarea name="question" id="" cols="30" rows="4" required><%= question.question %></textarea>
             <label for="">Image URL</label>
             <input type="text" name="imageURL" id="" value="<%= question.imageURL %>">
             <div id="choices">
                 <label for="">Choices</label>
-                <span id="add-choice"><img src="/images/plus-circle.svg" alt="">Add a choice</span>
+                <span id="add-choice"><img src="/images/plus.png" alt="">Add a choice</span>
                 <% question.options.forEach(option => { %>
                     <div class="choice">
                         <input type="text" name="options" id="" value="<%= option %>">
-                        <span class="delete-choice"><img src="/images/x-circle.svg" alt=""></span>
+                        <div>
+                            
+                            <% if(option === question.answer) { %>
+                                <img class="markBtn" src="/images/correct.png" alt="">    
+                            <% } else { %>
+                                <img class="markBtn" src="/images/check-mark.png" alt="">
+                            <% } %>
+
+                            <img class="delete-choice" src="/images/remove.png" alt="">
+                        </div>
                     </div>
                 <% }) %>
             </div>
-            <!-- <label for="">Correct answer</label>
-            <input type="text" name="answer" id="" value="<%= question.answer %>" required> -->
+            <input type="hidden" name="answer" id="answer" value="<%= question.answer %>"> 
             <input type="submit" value="Save">
         </form>
     </main>
