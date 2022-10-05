@@ -26,7 +26,7 @@
     background-color: #f2f3f2;
 }
 
-#add form select, #add form input {
+#add form select, #add form input, #add form textarea {
     font-size: 25px;
     padding: 5px;
     margin-bottom: 5px;
