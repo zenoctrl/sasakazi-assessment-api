@@ -1,6 +1,7 @@
 import express from 'express'
 import methodOverride from 'method-override'
 import mysql from 'mysql'
+import fetch from 'node-fetch'
 
 const app = express()
 const connection = mysql.createConnection({
@@ -58,26 +59,57 @@ const replaceOptionsAnswer = data => {
 
 // get all questions
 app.get('/questions', (req, res) => {
-    connection.query(
-        'SELECT * FROM questions',
-        (error, results) => {
-            const questions = []
-            results.forEach(result => {
 
-                let { options, answer } = replaceOptionsAnswer(result)
+    if (req.query.field) {
 
-                if (result.category === 'aptitude test') {
-                    const question = {
-                        id: result.id,
-                        category: result.category,
-                        question: result.question,
-                        imageURL: result.imageURL,
-                        options: options,
-                        answer: answer
+        fetch('http://localhost:3000/questions/fields').
+        then((response) => response.json()).
+        then((fields) => {
+            if (fields.includes(req.query.field)) {
+                connection.query(
+                    'SELECT * FROM questions WHERE field = ?',
+                    [req.query.field],
+                    (error, results) => {
+                        const questions = []
+                        results.forEach(result => {
+            
+                            let { options, answer } = replaceOptionsAnswer(result)
+            
+                            const question = {
+                                id: result.id,
+                                category: result.category,
+                                field: result.field,
+                                question: result.question,
+                                imageURL: result.imageURL,
+                                options: options,
+                                answer: answer
+                            }
+            
+                            if (question.category === 'Aptitude Test') {
+                                delete question.field
+                            } 
+                
+                            questions.push(question)
+                            
+                        })
+                        res.status(200).send(questions)
                     }
+                )
+            } else {
+                res.status(404).send(`No questions found that belong to the field: ${req.query.field}`)
+            }
+        })
+
+        
+    } else {
+        connection.query(
+            'SELECT * FROM questions',
+            (error, results) => {
+                const questions = []
+                results.forEach(result => {
     
-                    questions.push(question)
-                } else {
+                    let { options, answer } = replaceOptionsAnswer(result)
+    
                     const question = {
                         id: result.id,
                         category: result.category,
@@ -88,12 +120,19 @@ app.get('/questions', (req, res) => {
                         answer: answer
                     }
     
+                    if (question.category === 'Aptitude Test') {
+                        delete question.field
+                    } 
+        
                     questions.push(question)
-                }
-            })
-            res.send(questions)
-        }
-    )
+                    
+                })
+                res.status(200).send(questions)
+            }
+        )
+    }
+
+    
 })
 
 // get an individual question
@@ -102,20 +141,10 @@ app.get('/question/:id', (req, res) => {
         'SELECT * FROM questions WHERE id = ?',
         [parseInt(req.params.id)],
         (error, results) => {
-            let result = results[0]
-            let { options, answer } = replaceOptionsAnswer(results[0])
-            if (results.category === 'aptitude test') {
-                const question = {
-                    id: result.id,
-                    category: result.category,
-                    question: result.question,
-                    imageURL: result.imageURL,
-                    options: options,
-                    answer: answer
-                }
+            if (results.length > 0) {
+                let result = results[0]
+                let { options, answer } = replaceOptionsAnswer(results[0])
 
-                res.send(question)
-            } else {
                 const question = {
                     id: result.id,
                     category: result.category,
@@ -126,7 +155,13 @@ app.get('/question/:id', (req, res) => {
                     answer: answer
                 }
 
-                res.send(question)
+                if(question.category === 'Aptitude Test') {
+                    delete question.field
+                }
+
+                res.status(400).send(question)
+            } else {
+                res.status(404).send(`No question has id: ${req.params.id}`)
             }
         }
     )
@@ -196,12 +231,44 @@ app.get('/edit/:id', (req, res) => {
 app.put('/edit/:id', (req, res) => {
 
     let { options, answer } = replaceOptionsAnswer(req.body)
+    const test = {
+        category: req.body.category,
+        field: req.body.field || null,
+        question: req.body.question,
+        imageURL: req.body.imageURL,
+        options: options,
+        answer: answer
+    }
 
     connection.query(
-        'UPDATE questions SET category = ?, question = ? , imageURL = ?, options = JSON_ARRAY(?), answer = ? WHERE id = ?',
-        [req.body.category, req.body.question, req.body.imageURL, [...options], answer, parseInt(req.params.id)],
+        'UPDATE questions SET category = ?, field = ?, question = ? , imageURL = ?, options = JSON_ARRAY(?), answer = ? WHERE id = ?',
+        [
+            test.category, 
+            test.field, 
+            test.question, 
+            test.imageURL, 
+            [...test.options], 
+            test.answer, 
+            parseInt(req.params.id)
+        ],
         (error, results) => {
-            res.redirect('/questions')
+            res.redirect(`/question/${parseInt(req.params.id)}`)
+        }
+    )
+})
+
+// get available fields for the skill-based test 
+app.get('/questions/fields', (req, res) => {
+    let sql = 'SELECT DISTINCT(field) FROM questions'
+    connection.query(
+        sql, (error, results) => {
+            const fields = []
+            results.forEach(result => {
+                if (result.field !== null) {
+                    fields.push(result.field)
+                }
+            })
+            res.send(fields)
         }
     )
 })
