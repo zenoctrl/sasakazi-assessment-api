@@ -59,19 +59,29 @@
 
 nav {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
     align-items: center;
-    height: 60px;
+    height: 80px;
 }
 
-nav a {
-   margin-left: auto; 
+nav img {
+    width: 40px;
+    height: 40px;
+}
+
+nav li {
+    display: inline;
+}
+
+nav a { 
    text-decoration: none;
-   background-color: #8cc63f;
-   border-radius: 5px;
+   color: #8cc63f;
    padding: 4px 8px;
-   color: #fff;
    font-size: 22px;
+}
+
+nav li a:hover {
+    border-bottom: 2px solid #8cc63f;
 }
 
 #add form {
@@ -79,7 +89,7 @@ nav a {
     flex-direction: column;
     margin: 20px auto 0;
     width: 80%;
-    font-size: 24px;
+    font-size: 19px;
     padding: 15px;
     border: 1px solid #f2f3f2;
     border-radius: 10px;
@@ -87,7 +97,7 @@ nav a {
 }
 
 #add form select, #add form input, #add form textarea {
-    font-size: 25px;
+    font-size: 19px;
     padding: 5px;
     margin-bottom: 5px;
 }
@@ -131,6 +141,8 @@ nav a {
 }
 
 
+
+
 #add form input[type='submit'] {
     width: 100px;
     background-color: #008000;
@@ -143,6 +155,88 @@ nav a {
 #field {
     display: none;
 }
+
+#dashboard {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#dashboard .board {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f2f3f2;
+    border-radius: 10px;
+    gap: 5px;
+    width: 30%;
+    height: 150px;
+}
+
+#dashboard .board a {
+    text-decoration: none;
+    color: #000;
+    cursor: default;
+}
+
+#test .title {
+    text-align: center;
+    margin: 15px;
+}
+
+#test .question {
+    margin-bottom: 8px;
+}
+
+#test .question .options {
+    margin: 5px 0;
+    background-color: #f2f3f2;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#test .question .options div {
+    display: flex;
+    align-items: center;
+}
+
+#test .question .options img {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+}
+
+#test .question .options p {
+    font-size: 19px;
+}
+
+#test .question .btns {
+    margin-top: 5px;
+    display: flex;
+}
+
+#test .question .btns a {
+    text-decoration: none;
+    text-align: center;
+    color: #fff;
+    padding: 3px;
+    width: 70px;
+}
+
+#test .question .btns .edit {
+    margin-right: 5px;
+    background-color: #ff0000;
+    border: 1px solid #ff0000;
+}
+
+#test .question .btns .delete {
+    background-color: #008000;
+    border: 1px solid #008000;
+}
+
+
 
 @media screen and (max-width:600px) {
     .container {
