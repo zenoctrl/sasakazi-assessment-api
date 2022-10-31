@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+
+    <main id="login">
+        <form action="">
+            <img src="/images/logo-shorthand.png" alt="">
+
+            <% if(error) { %>
+                <p class="error"><%= message %></p>
+            <% } %>
+
+            <input type="email" name="email" id="" placeholder="Email Address" value="<%= user.email %>">
+            <input type="password" name="password" id="" placeholder="Password" value="<%= user.password %>">
+            <input type="submit" value="Log In">
+        </form>
+    </main>
+
+<%- include('partials/footer') %>
