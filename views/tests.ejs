@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+
+    <%- include('partials/nav') %>
+
+    <main class="container" id="test">
+
+        <h2 class="title"><%= category%></h2>
+
+        <% questions.forEach(question => { %>
+
+            <div class="question">
+                <h3><%= `${questions.indexOf(question) + 1}. ${question.question}` %></h3>
+                <div class="options">
+                    <% question.options.forEach(option => { %>
+                        <% if(option === question.answer) { %>
+                            <div><img src="/images/correct.png" alt=""><p><%= option %></p></div>
+                        <% } else { %>
+                            <div><img src="/images/remove.png" alt=""><p><%= option %></p></div>
+                        <% } %>
+                    <% }) %>
+                </div>
+                <div class="btns">
+                    <a href="/edit/<%= question.id %>" class="edit">Edit</a>
+                    <a href="/delete/<%= question.id %>" class="delete">Delete</a>
+                </div>
+
+            </div>
+
+        <% }) %>
+
+    </main>
+
+<%- include('partials/footer') %>
