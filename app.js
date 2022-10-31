@@ -2,6 +2,7 @@ import express from 'express'
 import methodOverride from 'method-override'
 import mysql from 'mysql'
 import fetch from 'node-fetch'
+import session from 'express-session'
 
 const app = express()
 const connection = mysql.createConnection({
@@ -11,6 +12,20 @@ const connection = mysql.createConnection({
     database: 'api_test'
 })
 
+app.use(session({
+    secret: 'mtihani',
+    resave: true,
+    saveUninitialized: false
+}))
+
+app.use((req, res, next) => {
+    if (req.session.user === undefined) {
+        res.locals.isLoggedIn = false
+    } else {
+    res.locals.isLoggedIn = true
+    }
+    next()
+})
 
 const questions = []
 
@@ -169,7 +184,12 @@ app.get('/question/:id', (req, res) => {
 
 // add a question - display form
 app.get('/add', (req, res) => {
-    res.render('add.ejs');
+    if (res.locals.isLoggedIn) {
+        res.render('add.ejs');
+    } else {
+    res.redirect('/login')
+    }
+    
 })
 
 // add a question - submit form
@@ -208,23 +228,27 @@ app.post('/add', (req, res) => {
 
 // edit a question - display form
 app.get('/edit/:id', (req, res) => {
-    connection.query(
-        'SELECT * FROM questions where id = ?',
-        [parseInt(req.params.id)],
-        (error, results) => {
-            let { options, answer } = replaceOptionsAnswer(results[0])
-            const question = {
-                id: results[0].id,
-                category: results[0].category,
-                field: results[0].field,
-                question: results[0].question,
-                imageURL: results[0].imageURL,
-                options: options,
-                answer: answer
+    if (res.locals.isLoggedIn) {
+        connection.query(
+            'SELECT * FROM questions where id = ?',
+            [parseInt(req.params.id)],
+            (error, results) => {
+                let { options, answer } = replaceOptionsAnswer(results[0])
+                const question = {
+                    id: results[0].id,
+                    category: results[0].category,
+                    field: results[0].field,
+                    question: results[0].question,
+                    imageURL: results[0].imageURL,
+                    options: options,
+                    answer: answer
+                }
+                res.render('edit.ejs', {question: question})
             }
-            res.render('edit.ejs', {question: question})
-        }
-    )
+        )
+    } else {
+        res.redirect('/login')
+    }
 })
 
 // edit a question
@@ -282,6 +306,48 @@ app.delete('/delete-question/:id', (req, res) => {
             res.redirect('/questions')
         }
     )
+})
+
+// login
+app.get('/login', (req, res) => {
+    const user = {
+        email: '',
+        password: ''
+    }
+    res.render('login', { error: false, user })
+})
+
+app.post('/login', (req, res) => {
+    const user = {
+        email: req.body.email,
+        password: req.body.password
+    }
+
+    let sql = 'SELECT * FROM user WHERE email = ?'
+    connection.query(
+        sql, [user.email], (error, results) => {
+            if (results.length > 0) {
+                if (user.password === results[0].password) {
+                    req.session.userID = results[0].id
+                    res.redirect('/')
+                } else {
+                    let message = 'Incorrect Password'
+                    res.render('login', {error: true, message, user})
+                }
+            } else {
+                let message = 'No account exist with the email provided'
+                res.render('login', {error: true, message, user})
+            }
+        }
+    )
+
+})
+
+// log out
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/login')
+    })
 })
 
 const PORT = process.env.PORT || 3000
