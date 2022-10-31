@@ -1,5 +1,7 @@
 <%- include('partials/header') %>
 
+    <%- include('partials/nav') %>
+
     <main class="container" id="add">
         <form action="/edit/<%= question.id %>?_method=PUT" method="post">
             <h1>Edit a question</h1>
