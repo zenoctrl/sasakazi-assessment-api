@@ -19,7 +19,7 @@ app.use(session({
 }))
 
 app.use((req, res, next) => {
-    if (req.session.user === undefined) {
+    if (req.session.userID === undefined) {
         res.locals.isLoggedIn = false
     } else {
     res.locals.isLoggedIn = true
@@ -219,7 +219,11 @@ app.post('/add', (req, res) => {
             if (error) {
                 res.send(error)
             } else {
-                res.redirect('/questions')
+                if (test.category === 'Aptitude Test') {
+                    res.redirect(`/tests/${test.category}`)
+                } else {
+                    res.redirect(`/tests/${test.field}`)
+                }
             } 
         }
     )
@@ -276,7 +280,12 @@ app.put('/edit/:id', (req, res) => {
             parseInt(req.params.id)
         ],
         (error, results) => {
-            res.redirect(`/question/${parseInt(req.params.id)}`)
+            if (test.category === 'Aptitude Test') {
+                res.redirect(`/tests/${test.category}`)
+            } else {
+                res.redirect(`/tests/${test.field}`)
+            }
+            
         }
     )
 })
@@ -298,7 +307,7 @@ app.get('/questions/fields', (req, res) => {
 })
 
 // delete a question
-app.delete('/delete-question/:id', (req, res) => {
+app.delete('/delete/:id', (req, res) => {
     connection.query(
         'DELETE FROM questions WHERE id = ?',
         [parseInt(req.params.id)],
@@ -306,6 +315,54 @@ app.delete('/delete-question/:id', (req, res) => {
             res.redirect('/questions')
         }
     )
+})
+
+// dashboard
+app.get('/', (req, res) => {
+    if (res.locals.isLoggedIn) {
+        let sql = 'SELECT * FROM questions'
+        connection.query(
+            sql, (error, results) => {
+                res.render('index', {questions: results})
+            }
+        )
+    } else {
+        res.redirect('/login')
+    }
+})
+
+// view test
+app.get('/test/:category', (req, res) => {
+    if (res.locals.isLoggedIn) {
+        let sql
+        if (req.params.category === 'Aptitude Test') {
+            sql = 'SELECT * FROM questions WHERE category = ?'
+        } else {
+            sql = 'SELECT * FROM questions WHERE field = ?'
+        }
+
+        connection.query(
+            sql, 
+            [ req.params.category ],
+            (error, results) => {
+                const questions = []
+                results.forEach(result => {
+                    let { options, answer } = replaceOptionsAnswer(result)
+                    const question = {
+                        id: result.id,
+                        question: result.question,
+                        imageURL: result.imageURL,
+                        options: options,
+                        answer: answer
+                    }
+                    questions.push(question)
+                })
+                res.render('tests', {questions, category: req.params.category})
+            }
+        )
+    } else {
+        res.redirect('/login')
+    }
 })
 
 // login
