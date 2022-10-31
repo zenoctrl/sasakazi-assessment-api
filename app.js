@@ -308,13 +308,17 @@ app.get('/questions/fields', (req, res) => {
 
 // delete a question
 app.delete('/delete/:id', (req, res) => {
-    connection.query(
-        'DELETE FROM questions WHERE id = ?',
-        [parseInt(req.params.id)],
-        (error, results) => {
-            res.redirect('/questions')
-        }
-    )
+    if (res.locals.isLoggedIn) {
+        connection.query(
+            'DELETE FROM questions WHERE id = ?',
+            [parseInt(req.params.id)],
+            (error, results) => {
+                res.redirect('/')
+            }
+        )
+    } else {
+        res.redirect('/login')
+    }
 })
 
 // dashboard
