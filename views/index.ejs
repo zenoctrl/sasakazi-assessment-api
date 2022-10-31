@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+    <%- include('partials/nav') %>
+
+    <main class="container" id="dashboard">
+        <% const fields = Array.from(new Set(questions.map(question => question.field))).filter(field => typeof field === 'string') %>
+        <% fields.push('Aptitude Test') %>
+
+        <% fields.forEach(field => { %>
+            <div class="board">
+
+                <% if(field === 'Aptitude Test'){ %>
+                    <h2><%= questions.filter(question => question.category === field).length %></h2>
+                    <p><a href="/test/<%= field %>"><%= field %></a></p>
+                <% } else { %>
+                    <h2><%= questions.filter(question => question.field === field).length %></h2>
+                    <p><a href="/test/<%= field %>"><%= field %></a></p>
+                    <em><small>Skill-Based</small></em>
+                <% } %>
+
+                
+            </div>
+        <% }) %>
+
+    </main>
+
+    <script>
+        const boards = document.querySelectorAll('.board')
+
+        boards.forEach(board => {
+            board.addEventListener('click', () => {
+                location.href = board.children[1].firstElementChild.href
+            })
+        })
+
+    </script>
+
+<%- include('partials/footer') %>
