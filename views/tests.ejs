@@ -20,8 +20,10 @@
                     <% }) %>
                 </div>
                 <div class="btns">
-                    <a href="/edit/<%= question.id %>" class="edit">Edit</a>
-                    <a href="/delete/<%= question.id %>" class="delete">Delete</a>
+                    <a href="/edit/<%= question.id %>" class="btn edit">Edit</a>
+                    <form action="/delete/<%= question.id %>?_method=DELETE" method="post">
+                        <input type="submit" class="btn delete" value="Delete">
+                    </form>
                 </div>
 
             </div>
