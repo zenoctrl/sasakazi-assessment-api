@@ -3,6 +3,9 @@ let choices = document.querySelector('#choices')
 let deleteChoiceBtns = document.querySelectorAll('.delete-choice')
 let selectCategory = document.querySelector('#category')
 let selectField = document.querySelector('#field')
+let changePicDiv = document.querySelector('#change-pic')
+let radioBtns = document.querySelectorAll('input[name="changePic"]')
+
 const fields = [
     'AI, IoT, Cloud computing',
     'Data Science/Data Analytics',
@@ -93,4 +96,17 @@ document.querySelectorAll('.markBtn').forEach(markBtn => {
 
 deleteChoiceBtns.forEach(deleteBtn => {
     deleteBtn.addEventListener('click', deleteChoice)
+})
+
+radioBtns.forEach(radioBtn => {
+    radioBtn.addEventListener('change', () => {
+        if (radioBtn.value === 'Yes') {
+            changePicDiv.nextElementSibling.style.display = 'block'
+            changePicDiv.previousElementSibling.style.display = 'none'
+        } else {
+            changePicDiv.nextElementSibling.style.display = 'none'
+            changePicDiv.previousElementSibling.style.display = 'block'
+            
+        }
+    })
 })
