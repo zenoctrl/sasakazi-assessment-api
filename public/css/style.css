@@ -217,12 +217,15 @@ nav li a:hover {
     display: flex;
 }
 
-#test .question .btns a {
+#test .question .btns .btn {
     text-decoration: none;
     text-align: center;
     color: #fff;
     padding: 3px;
     width: 70px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bolder;
 }
 
 #test .question .btns .edit {
@@ -231,12 +234,20 @@ nav li a:hover {
     border: 1px solid #ff0000;
 }
 
+#test .question .btns .edit:hover {
+    background-color: #fff;
+    color: #ff0000;
+}
+
 #test .question .btns .delete {
     background-color: #008000;
     border: 1px solid #008000;
 }
 
-
+#test .question .btns .delete:hover {
+    background-color: #fff;
+    color: #008000;
+}
 
 @media screen and (max-width:600px) {
     .container {
