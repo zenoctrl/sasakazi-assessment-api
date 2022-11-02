@@ -89,22 +89,31 @@ nav li a:hover {
     flex-direction: column;
     margin: 20px auto 0;
     width: 80%;
-    font-size: 19px;
+    font-size: 17px;
     padding: 15px;
     border: 1px solid #f2f3f2;
     border-radius: 10px;
     background-color: #f2f3f2;
+    gap: 6px;
 }
 
 #add form select, #add form input, #add form textarea {
-    font-size: 19px;
-    padding: 5px;
+    font-size: 17px;
+    padding: 2px 5px;
     margin-bottom: 5px;
 }
 
 #add form #choices {
     display: flex;
     flex-direction: column;
+}
+
+#add form > img {
+    width: 30%;
+}
+
+#add #new-pic {
+    display: none;
 }
 
 #add-choice {
@@ -118,8 +127,8 @@ nav li a:hover {
 }
 
 #add-choice img {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     margin-right: 10px;
 }
 
@@ -136,8 +145,8 @@ nav li a:hover {
 
 .choice img {
     margin-left: 5px;
-    width: 45px;
-    height: 45px;
+    width: 24px;
+    height: 24px;
 }
 
 
@@ -187,11 +196,18 @@ nav li a:hover {
 }
 
 #test .question {
+    display: flex;
+    flex-direction: column;
     margin-bottom: 8px;
 }
 
+#test .question > img {
+    width: 30%;
+}
+
+
 #test .question .options {
-    margin: 5px 0;
+    /* margin: 5px 0; */
     background-color: #f2f3f2;
     padding: 10px;
     border-radius: 5px;
