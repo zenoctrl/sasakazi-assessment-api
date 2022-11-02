@@ -10,6 +10,7 @@
 
             <div class="question">
                 <h3><%= `${questions.indexOf(question) + 1}. ${question.question}` %></h3>
+                <img src="/uploads/<%= question.imageURL %>" alt="">
                 <div class="options">
                     <% question.options.forEach(option => { %>
                         <% if(option === question.answer) { %>

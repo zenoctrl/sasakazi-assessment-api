@@ -3,7 +3,7 @@
     <%- include('partials/nav') %>
 
     <main class="container" id="add">
-        <form action="/edit/<%= question.id %>?_method=PUT" method="post">
+        <form action="/edit/<%= question.id %>?_method=PUT" method="post" enctype="multipart/form-data">
             <h1>Edit a question</h1>
             <select name="category" id="category" required>
                 <option value="<%= question.category %>"><%= question.category %></option>
@@ -20,8 +20,27 @@
             
             <label for="">Question</label>
             <textarea name="question" id="" cols="30" rows="4" required><%= question.question %></textarea>
-            <label for="">Image URL</label>
-            <input type="text" name="imageURL" id="" value="<%= question.imageURL %>">
+
+            <% if(question.imageURL) { %>
+                <input type="hidden" name="imageURL" value="<%= question.imageURL %>">
+                <img src="/uploads/<%= question.imageURL %>" alt="">
+                <div id="change-pic">
+                    <label for="">Would you like to change the picture?</label>
+                    <div>
+                        <input type="radio" name="changePic" id="" value="No" checked> No
+                        <input type="radio" name="changePic" id="" value="Yes"> Yes
+                    </div>
+                </div>
+                <div id="new-pic">
+                    <label for="">Picture</label>
+                    <input type="file" name="picture" id="">
+                </div>
+            <% } else { %>
+                <label for="">Picture</label>
+                <input type="file" name="picture" id="">
+            <% } %>
+
+            
             <div id="choices">
                 <label for="">Choices</label>
                 <span id="add-choice"><img src="/images/plus.png" alt="">Add a choice</span>
