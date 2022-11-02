@@ -4,7 +4,7 @@
 
 
     <main class="container" id="add">
-        <form action="/add" method="post">
+        <form action="/add" method="post" enctype="multipart/form-data">
             <h1>Add a question</h1>
             <select name="category" id="category" required>
                 <option value="">-- Please choose a category --</option>
@@ -17,8 +17,8 @@
 
             <label for="">Question</label>
             <textarea name="question" id="" cols="30" rows="4" required></textarea>
-            <label for="">Image URL</label>
-            <input type="text" name="imageURL" id="">
+            <label for="">Picture</label>
+            <input type="file" name="picture">
             <div id="choices">
                 <label for="">Choices</label>
                 <span id="add-choice"><img src="/images/plus.png" alt="">Add a choice</span>
