@@ -8,7 +8,7 @@ let radioBtns = document.querySelectorAll('input[name="changePic"]')
 
 const fields = [
     'AI, IoT, Cloud computing',
-    'Data Science/Data Analytics',
+    'Data Science, Data Analytics',
     'Digital Marketing',
     'Graphic Design',
     'Tech Support',
