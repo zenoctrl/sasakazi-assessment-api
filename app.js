@@ -33,6 +33,13 @@ app.use((req, res, next) => {
 
 const questions = []
 
+const nonAutoGradedTests = [
+    'Data Science, Data Analytics',
+    'Graphic Design',
+    'Software Development',
+    'Video Editing'
+]
+
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.json())
@@ -92,19 +99,31 @@ app.get('/questions', (req, res) => {
                         const questions = []
                         results.forEach(result => {
             
-                            let { options, answer } = replaceOptionsAnswer(result)
+                            if (nonAutoGradedTests.includes(req.query.field)) {
+
+                                const question = {
+                                    id: result.id,
+                                    category: result.category,
+                                    field: result.field,
+                                    question: result.question
+                                }
+                                questions.push(question)
+                                
+                            } else {
+                                let { options, answer } = replaceOptionsAnswer(result)
             
-                            const question = {
-                                id: result.id,
-                                category: result.category,
-                                field: result.field,
-                                question: result.question,
-                                imageURL: result.imageURL,
-                                options: options,
-                                answer: answer
+                                const question = {
+                                    id: result.id,
+                                    category: result.category,
+                                    field: result.field,
+                                    question: result.question,
+                                    imageURL: result.imageURL,
+                                    options: options,
+                                    answer: answer
+                                }
+                                questions.push(question)
                             }
-                
-                            questions.push(question)
+            
                             
                         })
                         res.status(200).send(questions)
@@ -147,31 +166,42 @@ app.get('/questions', (req, res) => {
             (error, results) => {
                 const questions = []
                 results.forEach(result => {
-    
-                    let { options, answer } = replaceOptionsAnswer(result)
-    
-                    const question = {
-                        id: result.id,
-                        category: result.category,
-                        field: result.field,
-                        question: result.question,
-                        imageURL: result.imageURL,
-                        options: options,
-                        answer: answer
-                    }
-    
-                    if (question.category === 'Aptitude Test') {
-                        delete question.field
-                    } 
 
-                    if (typeof question.imageURL === 'string' && question.imageURL.length > 0) {
-                        question.imageURL = `http://localhost:3000/uploads/${question.imageURL}`
-                        
+                    if (nonAutoGradedTests.includes(result.field)) {
+                        const question = {
+                            id: result.id,
+                            category: result.category,
+                            field: result.field,
+                            question: result.question
+                        }
+                        questions.push(question)
                     } else {
-                        delete question.imageURL
-                    }
+                        let { options, answer } = replaceOptionsAnswer(result)
+    
+                        const question = {
+                            id: result.id,
+                            category: result.category,
+                            field: result.field,
+                            question: result.question,
+                            imageURL: result.imageURL,
+                            options: options,
+                            answer: answer
+                        }
         
-                    questions.push(question)
+                        if (question.category === 'Aptitude Test') {
+                            delete question.field
+                        } 
+
+                        if (typeof question.imageURL === 'string' && question.imageURL.length > 0) {
+                            question.imageURL = `http://localhost:3000/uploads/${question.imageURL}`  
+                        } else {
+                            delete question.imageURL
+                        }
+            
+                        questions.push(question)
+                        
+                    }
+    
                     
                 })
                 res.status(200).send(questions)
@@ -233,44 +263,67 @@ app.get('/add', (req, res) => {
 
 // add a question - submit form
 app.post('/add', uploads.single('picture'), (req, res) => {
-    let { options, answer } = replaceOptionsAnswer(req.body)
-    
-    const test = {
-        category: req.body.category,
-        field: req.body.field || null,
-        question: req.body.question,
-        imageURL: null,
-        options: options,
-        answer: answer
-    }
 
-    if (req.file) {
-        test.imageURL = req.file.filename
-    }
-
-    connection.query(
-        'INSERT INTO questions (category, field, question, imageURL, options, answer) VALUES (?,?,?,?,JSON_ARRAY(?),?)',
-        [
-            test.category, 
-            test.field,
-            test.question,
-            test.imageURL, 
-            [...test.options], 
-            test.answer
-        ],
-        (error, results) => {
-            if (error) {
-                res.send(error)
-            } else {
-                if (test.category === 'Aptitude Test') {
-                    res.redirect(`/test/${test.category}`)
-                } else {
-                    res.redirect(`/test/${test.field}`)
-                }
-            } 
+    if (nonAutoGradedTests.includes(req.body.field)) {
+        const test = {
+            category: req.body.category,
+            test: req.body.field,
+            question: req.body.question
         }
-    )
+        
+        let sql = 'INSERT INTO questions (category, field, question) VALUES (?,?,?)'
+        connection.query(
+            sql, 
+            [
+                test.category,
+                test.field,
+                test.question
+            ],
+            (error, results) => {
+                res.redirect(`/test/${test.category}`)
+            }
+        )
+        
+    } else {
+        let { options, answer } = replaceOptionsAnswer(req.body)
     
+        const test = {
+            category: req.body.category,
+            field: req.body.field || null,
+            question: req.body.question,
+            imageURL: null,
+            options: options,
+            answer: answer
+        }
+
+        if (req.file) {
+            test.imageURL = req.file.filename
+        }
+
+        connection.query(
+            'INSERT INTO questions (category, field, question, imageURL, options, answer) VALUES (?,?,?,?,JSON_ARRAY(?),?)',
+            [
+                test.category, 
+                test.field,
+                test.question,
+                test.imageURL, 
+                [...test.options], 
+                test.answer
+            ],
+            (error, results) => {
+                if (error) {
+                    res.send(error)
+                } else {
+                    if (test.category === 'Aptitude Test') {
+                        res.redirect(`/test/${test.category}`)
+                    } else {
+                        res.redirect(`/test/${test.field}`)
+                    }
+                } 
+            }
+        )
+    }
+ 
 })
 
 // edit a question - display form
@@ -404,15 +457,28 @@ app.get('/test/:category', (req, res) => {
             (error, results) => {
                 const questions = []
                 results.forEach(result => {
-                    let { options, answer } = replaceOptionsAnswer(result)
-                    const question = {
-                        id: result.id,
-                        question: result.question,
-                        imageURL: result.imageURL,
-                        options: options,
-                        answer: answer
+
+                    if (nonAutoGradedTests.includes(req.params.category)) {
+                        const question = {
+                            id: result.id,
+                            category: result.category,
+                            field: result.field,
+                            question: result.question
+                        }
+                        questions.push(question)
+                    } else {
+                        let { options, answer } = replaceOptionsAnswer(result)
+                        const question = {
+                            id: result.id,
+                            question: result.question,
+                            imageURL: result.imageURL,
+                            options: options,
+                            answer: answer
+                        }
+                        questions.push(question)
                     }
-                    questions.push(question)
+
+                    
                 })
                 res.render('tests', {questions, category: req.params.category})
             }
